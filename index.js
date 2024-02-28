@@ -14,9 +14,9 @@ function displayPrompt(string) {
 
 function drawVerticalLines(xMoves, oMoves){
     let space1Char =  xMoves[0] ?  "X" : oMoves[0] ? "O" : " ";
-    let space2Char =  xMoves[1] ?  "X" : oMoves[0] ? "O" : " ";
-    let space3Char =  xMoves[2] ?  "X" : oMoves[0] ? "O" : " ";
-    console.log(`| ${space1Char} | ${space2Char} | ${space3Char} |`);
+    let space2Char =  xMoves[1] ?  "X" : oMoves[1] ? "O" : " ";
+    let space3Char =  xMoves[2] ?  "X" : oMoves[2] ? "O" : " ";
+    console.log(` ${space1Char} | ${space2Char} | ${space3Char} `);
 }
 
 function drawHorizontalLines(){
