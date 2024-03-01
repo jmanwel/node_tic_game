@@ -17,24 +17,37 @@ function isValidInput(input) {
     return ["A","B","C"].includes(letter) && ["1","2","3"].includes(number);
 }
 
-function drawVerticalLines(xMoves, oMoves){
+function parseInput(input){
+    let [letter, number] = input.split("");
+    return[
+        ["A","B","C"].indexOf(letter),
+        ["1","2","3"].indexOf(number)
+    ];
+}
+
+function drawVerticalLines(xMoves, oMoves, label){
     let space1Char =  xMoves[0] ?  "X" : oMoves[0] ? "O" : " ";
     let space2Char =  xMoves[1] ?  "X" : oMoves[1] ? "O" : " ";
     let space3Char =  xMoves[2] ?  "X" : oMoves[2] ? "O" : " ";
-    console.log(` ${space1Char} | ${space2Char} | ${space3Char} `);
+    console.log(`${label}  ${space1Char} | ${space2Char} | ${space3Char} `);
 }
 
 function drawHorizontalLines(){
-    console.log("---+---+---");
+    console.log("  ---+---+---");
+}
+
+function drawLabels(){
+    console.log("   1   2   3  ");
 }
 
 function drawGrid(xMoves, oMoves){
     console.log();
-    drawVerticalLines(xMoves[0], oMoves[0]);
+    drawLabels();
+    drawVerticalLines(xMoves[0], oMoves[0], "A");
     drawHorizontalLines();
-    drawVerticalLines(xMoves[1], oMoves[1]);
+    drawVerticalLines(xMoves[1], oMoves[1], "B");
     drawHorizontalLines();
-    drawVerticalLines(xMoves[2], oMoves[2]);
+    drawVerticalLines(xMoves[2], oMoves[2], "C");
     console.log();
 }
 
@@ -96,7 +109,7 @@ async function startGame() {
     while (!game_is_over){
         let response = await displayPrompt(`${currentPlayer}, please enter your next move: `);
         if (isValidInput(response)){
-            let [yMove, xMove] = response.split(",").map(x=>Number(x));
+            let [yMove, xMove] = parseInput(response);
             let currentPlayerMoves = currentPlayer === "Player X" ? playerXMoves : playerOMoves;
             
             currentPlayerMoves[yMove][xMove]=1;
@@ -112,7 +125,7 @@ async function startGame() {
     }
 
     if (currentGameState === PLAYER_X_WINS){
-        console.log("Player X is the winner!!");
+        console.log("And the winner is...player X");
     }
 
     if (currentGameState === PLAYER_O_WINS){
