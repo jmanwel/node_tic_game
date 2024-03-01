@@ -12,6 +12,11 @@ function displayPrompt(string) {
     })
 }
 
+function isValidInput(input) {
+    let [letter, number] = input.split("");
+    return ["A","B","C"].includes(letter) && ["1","2","3"].includes(number);
+}
+
 function drawVerticalLines(xMoves, oMoves){
     let space1Char =  xMoves[0] ?  "X" : oMoves[0] ? "O" : " ";
     let space2Char =  xMoves[1] ?  "X" : oMoves[1] ? "O" : " ";
@@ -53,8 +58,8 @@ const PLAYER_O_WINS = "PLAYER_O_WINS";
 const CATS_GAME = "CATS_GAME";
 
 function getNextGameState(xMoves, oMoves){
-    let playerXWins = isHorizontalWin (xMoves);
-    let playerOWins = isHorizontalWin (oMoves);
+    let playerXWins = isHorizontalWin (xMoves) || isVerticalWin (xMoves) || isDiagonalWin(xMoves) || isCornerWin(xMoves);
+    let playerOWins = isHorizontalWin (oMoves) || isVerticalWin (oMoves) || isDiagonalWin(oMoves) || isCornerWin(oMoves);
 
     if (playerXWins){
         return PLAYER_X_WINS;
@@ -65,42 +70,60 @@ function getNextGameState(xMoves, oMoves){
     }
 
     return RUNNING;
+    
 }
 
 function isHorizontalWin (moves){
-    return moves.some(row => row.every(x => x === 1))
+    return moves.some(row => row.every(x => x));
 }
 
-function isVerticalWin (moves){}
-function isCatsGame (moves){}
+function isVerticalWin (moves){
+    return [0, 1, 2].some(colNumber => moves.every(row =>row[colNumber]));
+}
+
+function isDiagonalWin (moves){
+    return (moves[0][0] && moves[1][1] && moves[2][2])
+        || (moves[0][2] && moves[1][1] && moves[2][0]);
+}
+
+function isCornerWin (moves){
+    return moves[0][0] && moves[0][2] && moves[2][0] && moves[2][2];
+}
 
 async function startGame() {
     let currentGameState = RUNNING;
     drawGrid(playerXMoves, playerOMoves);
     while (!game_is_over){
         let response = await displayPrompt(`${currentPlayer}, please enter your next move: `);
-        let [yMove, xMove] = response.split(",").map(x=>Number(x));
-        let currentPlayerMoves = currentPlayer === "Player X" ? playerXMoves : playerOMoves;
-        
-        currentPlayerMoves[yMove][xMove]=1;
-        currentPlayer = currentPlayer === "Player X" ? "Player O" : "Player X"
-        currentGameState = getNextGameState(playerXMoves, playerOMoves);
-        game_is_over = [PLAYER_X_WINS, PLAYER_O_WINS, CATS_GAME].includes(currentGameState);
+        if (isValidInput(response)){
+            let [yMove, xMove] = response.split(",").map(x=>Number(x));
+            let currentPlayerMoves = currentPlayer === "Player X" ? playerXMoves : playerOMoves;
+            
+            currentPlayerMoves[yMove][xMove]=1;
+            currentPlayer = currentPlayer === "Player X" ? "Player O" : "Player X"
+            currentGameState = getNextGameState(playerXMoves, playerOMoves);
+            game_is_over = [PLAYER_X_WINS, PLAYER_O_WINS, CATS_GAME].includes(currentGameState);
+    
+            drawGrid(playerXMoves, playerOMoves);            
+        } else {
+            console.log("Not a valid input string, please enter a Capital letter followed by a number")
+        }
 
-        drawGrid(playerXMoves, playerOMoves);
     }
 
     if (currentGameState === PLAYER_X_WINS){
-        console.log("Player X is the winne!");
+        console.log("Player X is the winner!!");
     }
 
     if (currentGameState === PLAYER_O_WINS){
-        console.log("Player O is the winner!");
+        console.log("Player O is the winner!!");
     }
 
     if (currentGameState === CATS_GAME){
         console.log("It's a tie!");
     }
+
+    rl.close();
 }
 
 startGame();
